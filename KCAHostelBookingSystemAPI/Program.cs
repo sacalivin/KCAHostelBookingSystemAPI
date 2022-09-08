@@ -1,8 +1,12 @@
+using BAL_CRUD.Interfaces;
 using BAL_CRUD.Services;
 using DAL_CRUD.Data;
+using DAL_CRUD.Repositories;
 using KCAHostelBookingSystemAPI.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -12,6 +16,10 @@ var builder = WebApplication.CreateBuilder(args);
 //TODO: make connection string for authentication
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("AuthConnection")));
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<AuthDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -27,8 +35,8 @@ builder.Services.AddAuthentication(options =>
        {
            ValidateIssuer = true,
            ValidateAudience = true,
-           ValidIssuer = builder.Configuration["JWT:Issuer"],
-           ValidAudience = builder.Configuration["JWT:Audience"],
+           ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+           ValidAudience = builder.Configuration["JWT:ValidAudience"],
            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
 
        };
@@ -38,11 +46,12 @@ builder.Services.AddAuthentication(options =>
     )
     ;
 
-builder.Services.AddTransient<UserService,UserService>();
-builder.Services.AddTransient<HostelService,HostelService>();
-builder.Services.AddTransient<BookService, BookService>();
-builder.Services.AddTransient<RentAlternativeService,RentAlternativeService>();
-builder.Services.AddTransient<ArmenityService,ArmenityService>();
+builder.Services.AddTransient<UnitOfWork>();
+builder.Services.AddTransient<IUserService,UserService>();
+builder.Services.AddTransient<IHostelService,HostelService>();
+builder.Services.AddTransient<IBookService, BookService>();
+builder.Services.AddTransient<IRentAlternativeService,RentAlternativeService>();
+builder.Services.AddTransient<IAmenityService,ArmenityService>();
 
 
 builder.Services.AddControllers();

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BAL_CRUD.Services
 {
-    public class RentAlternativeService : IService<RentAlternative>
+    public class RentAlternativeService : IRentAlternativeService
     {
         private readonly UnitOfWork _unitOfWork;
 

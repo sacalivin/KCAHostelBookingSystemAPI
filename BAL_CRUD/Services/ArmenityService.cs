@@ -1,4 +1,5 @@
-﻿using DAL_CRUD.Models;
+﻿using BAL_CRUD.Interfaces;
+using DAL_CRUD.Models;
 using DAL_CRUD.Repositories;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BAL_CRUD.Services
 {
-    public class ArmenityService
+    public class ArmenityService: IAmenityService
     {
         private readonly UnitOfWork _unitOfWork;
 

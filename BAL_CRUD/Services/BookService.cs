@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BAL_CRUD.Services
 {
-    public class BookService: IService<Book>
+    public class BookService: IBookService
     {
         private readonly UnitOfWork _unitOfWork;
 
