@@ -31,7 +31,10 @@ namespace BAL_CRUD.Services
 
         public Book Create(Book book)
         {
-            return _unitOfWork.BookRepository.Insert(book);
+            var result = _unitOfWork.BookRepository.Insert(book);
+            _unitOfWork.Save();
+            return result;
+
         }
 
         public bool Update(Book book)
@@ -39,8 +42,8 @@ namespace BAL_CRUD.Services
             try
             {
 
-                _unitOfWork.BookRepository.Update(book);
-
+                _unitOfWork.BookRepository.Update(book.Id,book);
+                _unitOfWork.Save();
                 return true;
             }
             catch (Exception)
@@ -57,7 +60,7 @@ namespace BAL_CRUD.Services
                 if (book != null)
                 {
                     _unitOfWork.BookRepository.Delete(id);
-
+                    _unitOfWork.Save();
                 }
                 return true;
             }
@@ -77,7 +80,7 @@ namespace BAL_CRUD.Services
             }
             catch (Exception)
             {
-                throw;
+                return null;
             }
         }
     }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BAL_CRUD.Services
 {
-    public class ArmenityService: IAmenityService
+    public class ArmenityService:IDisposable, IAmenityService
     {
         private readonly UnitOfWork _unitOfWork;
 
@@ -23,6 +23,7 @@ namespace BAL_CRUD.Services
         //Get amenity by Amenity Name  
         public Armenity? GetArmenityByArmenityName(string ArmenityName)
         {
+            
             return _unitOfWork.ArmenityRepository.Get().Where(x => x.Name == ArmenityName).FirstOrDefault();
         }
 
@@ -31,7 +32,10 @@ namespace BAL_CRUD.Services
 
         public Armenity Create(Armenity armenity)
         {
-            return _unitOfWork.ArmenityRepository.Insert(armenity);
+           
+               var result  = _unitOfWork.ArmenityRepository.Insert(armenity);
+            _unitOfWork.Save();
+            return result;
         }
 
         public bool Update(Armenity armenity)
@@ -39,11 +43,11 @@ namespace BAL_CRUD.Services
             try
             {
 
-                _unitOfWork.ArmenityRepository.Update(armenity);
-
+                _unitOfWork.ArmenityRepository.Update(armenity.Id,armenity);
+                _unitOfWork.Save();
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return false;
             }
@@ -57,6 +61,7 @@ namespace BAL_CRUD.Services
                 if (armenity != null)
                 {
                     _unitOfWork.ArmenityRepository.Delete(id);
+                    _unitOfWork.Save();
 
                 }
                 return true;
@@ -77,8 +82,14 @@ namespace BAL_CRUD.Services
             }
             catch (Exception)
             {
-                throw;
+                return null;
             }
+        }
+
+        public void Dispose()
+        {
+                _unitOfWork.Dispose();
+            
         }
     }
 }

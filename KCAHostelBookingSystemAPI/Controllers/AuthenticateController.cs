@@ -13,12 +13,12 @@ namespace KCAHostelBookingSystemAPI.Controllers
     [ApiController]
     public class AuthenticateController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
 
         public AuthenticateController(
-            UserManager<IdentityUser> userManager,
+            UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
             IConfiguration configuration
             )
@@ -33,8 +33,17 @@ namespace KCAHostelBookingSystemAPI.Controllers
         public async Task<IActionResult> Login([FromBody] Login model)
         {
             var user = await _userManager.FindByNameAsync(model.UserName);
+            var LoggedinUser =new Register();
             if(user != null && await _userManager.CheckPasswordAsync(user, model.Password))
             {
+                LoggedinUser = new Register()
+                {
+                    Firstname = user.FirstName,
+                    Lastname = user.LastName,
+                    Email = user.Email,
+                    HostelId = user.HostelId ?? 0,
+                };
+
                 var userRoles = await _userManager.GetRolesAsync(user);
 
                 var authClaims = new List<Claim>
@@ -53,7 +62,9 @@ namespace KCAHostelBookingSystemAPI.Controllers
                 return Ok(new
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiratation = token.ValidTo
+                    expiratation = token.ValidTo,
+                    roles = userRoles,
+                    appuser = LoggedinUser
                 });
             }
 
@@ -72,9 +83,12 @@ namespace KCAHostelBookingSystemAPI.Controllers
 
             }
 
-            IdentityUser user = new()
+            ApplicationUser user = new()
             {
-                Email = model.Email,
+                FirstName = model.Firstname,
+                LastName = model.Lastname,
+                HostelId = model.HostelId,
+                Email = model.Email.Replace(" ", String.Empty),
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Email
             };
@@ -85,11 +99,47 @@ namespace KCAHostelBookingSystemAPI.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
             }
 
+            //create role in the data base if they do not exist
+            if (!await _roleManager.RoleExistsAsync(UserRoles.Manager))
+                await _roleManager.CreateAsync(new IdentityRole(UserRoles.Manager));
+            if (!await _roleManager.RoleExistsAsync(UserRoles.User))
+                await _roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+            if (!await _roleManager.RoleExistsAsync(UserRoles.Admin))
+                await _roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
+
+            if (await _roleManager.RoleExistsAsync(UserRoles.Manager))
+            {
+                await _userManager.AddToRoleAsync(user, UserRoles.Manager); ;
+            }
+            if (await _roleManager.RoleExistsAsync(UserRoles.User))
+            {
+                await _userManager.AddToRoleAsync(user, UserRoles.User);
+            }
+
+
             return Ok(new Response { Status = "Success", Message = "User created successfully!" });
         }
 
+        [HttpGet]
+        public async Task<List<Register>> GetAll()
+        {
+            var identityUsers = await _userManager.GetUsersInRoleAsync(UserRoles.User);
+            List<Register> users = new List<Register>();
+            foreach (var identityUser in identityUsers)
+            {
+                var user = new Register()
+                {
+                    Email = identityUser.Email,
+                   
 
-        [HttpPost]
+                };
+                users.Add(user);
+            }
+            return users;
+        }
+
+
+            [HttpPost]
         [Route("register-admin")]
         public async Task<IActionResult> RegisterAdmin([FromBody] Register model)
         {
@@ -101,8 +151,11 @@ namespace KCAHostelBookingSystemAPI.Controllers
 
             }
 
-            IdentityUser user = new()
+            ApplicationUser user = new()
             {
+               FirstName = model.Firstname,
+               LastName = model.Lastname,
+               HostelId = model.HostelId,
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Email

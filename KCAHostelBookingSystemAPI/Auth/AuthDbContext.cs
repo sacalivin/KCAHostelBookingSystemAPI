@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KCAHostelBookingSystemAPI.Auth
 {
-    public class AuthDbContext : IdentityDbContext<IdentityUser>
+    public class AuthDbContext : IdentityDbContext<ApplicationUser>
     {
         public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options)
         {

@@ -65,9 +65,26 @@ namespace DAL_CRUD.Repositories
             }
             dbSet.Remove(entityToDelete);
         }
-        public virtual void Update(TEntity entityToUpdate)
+
+        // detach the entity before updating 
+        public virtual void Update(object id, TEntity entity)
         {
-            dbSet.Attach(entityToUpdate);
+            TEntity dbEntity = dbSet.Find(id);
+            context.Entry(dbEntity).State = EntityState.Detached;
+            context.SaveChanges();
+            Update(entity);
+        }
+        public virtual  void Update(TEntity entityToUpdate)
+        {
+            
+            if(context.Entry(entityToUpdate).State == EntityState.Detached)
+            {
+                dbSet.Attach(entityToUpdate);
+            }
+            //dbSet.Update(entityToUpdate);
+            
+
+
             context.Entry(entityToUpdate).State = EntityState.Modified;
         }
     }

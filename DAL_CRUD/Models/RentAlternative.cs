@@ -18,6 +18,8 @@ namespace DAL_CRUD.Models
         [Required]
         public double? Price { get; set; }
 
-        public ICollection<Armenity>? Armenities{ get; set; }
+        public Hostel? Hostel { get; set; }
+
+        public virtual ICollection<Armenity>? Armenities { get; set; }
     }
 }

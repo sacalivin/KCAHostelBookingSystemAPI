@@ -28,7 +28,7 @@ namespace DAL_CRUD.Repositories
         {
             get
             {
-                return this.UserRepository ?? new GenericRepository<User>(_context);
+                return userRepository ?? new GenericRepository<User>(_context);
             }
         }
         private GenericRepository<Hostel> hostelRepository;

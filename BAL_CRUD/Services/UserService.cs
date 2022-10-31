@@ -26,7 +26,9 @@ namespace BAL_CRUD.Services
        
         public User Create(User user)
         {
-            return _unitOfWork.UserRepository.Insert(user);
+            var result = _unitOfWork.UserRepository.Insert(user);
+            _unitOfWork.Save();
+            return result;
         }
 
         public bool Update(User user)
@@ -34,8 +36,8 @@ namespace BAL_CRUD.Services
             try
             {
 
-                _unitOfWork.UserRepository.Update(user);
-
+                _unitOfWork.UserRepository.Update(user.Id, user);
+                _unitOfWork.Save();
                 return true;
             }
             catch (Exception)
@@ -52,7 +54,7 @@ namespace BAL_CRUD.Services
                 if (user != null)
                 {
                     _unitOfWork.UserRepository.Delete(id);
-
+                    _unitOfWork.Save();
                 }
                 return true;
             }
@@ -72,7 +74,7 @@ namespace BAL_CRUD.Services
             }
             catch (Exception)
             {
-                throw;
+                return null;
             }
         }
     }

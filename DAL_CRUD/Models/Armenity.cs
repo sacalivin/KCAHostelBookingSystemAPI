@@ -19,6 +19,8 @@ namespace DAL_CRUD.Models
         [Required]   
         public string? IconUrl { get; set; }
 
+        public virtual ICollection<RentAlternative>? RentAlternatives { get; set;}
+
 
     }
 }

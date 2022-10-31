@@ -19,15 +19,12 @@ namespace DAL_CRUD.Models
         [Required]
         public string? ModeOfPayment { get; set; }
         [Required]
-        public DateOnly CheckinDate { get; set; }
+        public DateTime CheckinDate { get; set; }
         [Required]
         public DateTime BookingDate { get; set; } = DateTime.Now;
 
-        // 
-        [Required]
-        public int? RentAlternativeId { get; set; }
-        [Required]
-        public int HostelId { get; set; }
+       
+        public Hostel? Hostel { get; set; }
 
 
 

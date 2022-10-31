@@ -17,6 +17,7 @@ namespace KCAHostelBookingSystemAPI.Auth
 
             [Required(ErrorMessage = "Password is required")]
             public string? Password { get; set; }
-        
+        [Required(ErrorMessage = "HostelId is required")]
+        public int HostelId { get;  set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -21,11 +22,17 @@ namespace DAL_CRUD.Models
         [Required]
         public string? Location { get; set; }
         [Required]
+        public double RentalCost { get; set; }
+
         public string? ImageUrl { get; set; }
+        [NotMapped]
+        public IFormFile Image { get; set; }
 
 
-        public ICollection<Armenity>? Armenities { get; set; }
-        public ICollection<RentAlternative> RentAlternatives { get; set; }
+        //public ICollection<Armenity>? Armenities { get; set; }
+        public virtual ICollection<RentAlternative>? RentAlternatives { get; set; }
+        public virtual ICollection<User>? Users { get; set; }
+        public virtual ICollection<Book>? Books { get; set; }
 
 
     }

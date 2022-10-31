@@ -21,6 +21,17 @@ namespace DAL_CRUD.Models
         public string? ParentLastName { get; set; }
          [Required]
         public string? ParentPhoneNumber { get; set; }
+      
+        public string? Request { get; set; }
+
+        public string? ModeOfPayment { get; set; }
+        [Required]
+        public DateTime CheckinDate { get; set; }
+        
+        public DateTime BookingDate { get; set; } = DateTime.Now;
+
+        public int? HostelId { get; set; }
+        public Hostel? Hostel { get; set; }
          
     }
 }

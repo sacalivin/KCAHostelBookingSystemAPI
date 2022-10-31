@@ -31,7 +31,9 @@ namespace BAL_CRUD.Services
 
         public RentAlternative Create(RentAlternative rentAlternative)
         {
-            return _unitOfWork.RentAlternativeRepository.Insert(rentAlternative);
+            var result = _unitOfWork.RentAlternativeRepository.Insert(rentAlternative);
+            _unitOfWork.Save();
+            return result; 
         }
 
         public bool Update(RentAlternative rentAlternative)
@@ -39,7 +41,8 @@ namespace BAL_CRUD.Services
             try
             {
 
-                _unitOfWork.RentAlternativeRepository.Update(rentAlternative);
+                _unitOfWork.RentAlternativeRepository.Update(rentAlternative.Id, rentAlternative);
+                _unitOfWork.Save();
 
                 return true;
             }
@@ -57,6 +60,7 @@ namespace BAL_CRUD.Services
                 if (rentAlternative != null)
                 {
                     _unitOfWork.RentAlternativeRepository.Delete(id);
+                    _unitOfWork.Save();
 
                 }
                 return true;
@@ -77,7 +81,7 @@ namespace BAL_CRUD.Services
             }
             catch (Exception)
             {
-                throw;
+                return null;
             }
         }
     }

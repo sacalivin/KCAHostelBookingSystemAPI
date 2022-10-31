@@ -1,4 +1,5 @@
 ﻿using BAL_CRUD.Interfaces;
+using Bogus;
 using DAL_CRUD.Models;
 using DAL_CRUD.Repositories;
 using System;
@@ -31,7 +32,10 @@ namespace BAL_CRUD.Services
 
         public Hostel Create(Hostel hostel)
         {
-            return _unitOfWork.HostelRepository.Insert(hostel);
+            var result = _unitOfWork.HostelRepository.Insert(hostel);
+            _unitOfWork.Save();
+            return result;
+
         }
 
         public bool Update(Hostel hostel)
@@ -39,16 +43,20 @@ namespace BAL_CRUD.Services
             try
             {
 
-                _unitOfWork.HostelRepository.Update(hostel);
-
+                //_unitOfWork.HostelRepository.Update(hostel);
+                _unitOfWork.HostelRepository.Update(hostel.Id, hostel);
+                _unitOfWork.Save();
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return false;
             }
         }
-
+        public User? GetUserByHostelId(int hostelId)
+        {
+            return _unitOfWork.UserRepository.Get().FirstOrDefault(u => u.HostelId == hostelId);
+        }
         public bool Delete(int id)
         {
             try
@@ -56,12 +64,19 @@ namespace BAL_CRUD.Services
                 Hostel hostel = _unitOfWork.HostelRepository.GetByID(id);
                 if (hostel != null)
                 {
-                    _unitOfWork.HostelRepository.Delete(id);
+                    
+                    var user = GetUserByHostelId(id);
+                    if(user != null)
+                    {
+                        _unitOfWork.UserRepository.Delete(user.Id);
 
+                    }
+                    _unitOfWork.HostelRepository.Delete(id);
+                    _unitOfWork.Save();
                 }
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return false;
             }
@@ -73,11 +88,23 @@ namespace BAL_CRUD.Services
         {
             try
             {
-                return _unitOfWork.HostelRepository.Get().ToList();
+                return _unitOfWork.HostelRepository.Get().ToList() ;
+                /*var hostels = new Faker<Hostel>()
+
+                //Basic rules using built-in generators
+                .RuleFor(h => h.Id, f => f.Random.Number())
+                .RuleFor(u => u.Name, f => f.Name.FirstName())
+                .RuleFor(u => u.Description, f => f.Name.LastName())
+                .RuleFor(u => u.Location, f => f.Name.LastName())
+                .RuleFor(u => u.ImageUrl, f => f.Internet.Avatar());
+
+                 return hostels.Generate(20);
+                */
+
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                return null;
             }
         }
     }
