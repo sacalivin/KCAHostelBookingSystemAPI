@@ -3,6 +3,7 @@ using DAL_CRUD.Models;
 using KCAHostelBookingSystemAPI.Auth;
 using kcauHosteslAdmin.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -29,7 +30,7 @@ namespace KCAHostelBookingSystemAPI.Controllers
             
             return _hostelService.GetAll() == null ? Ok("No data in the data base") 
                 : Ok(_hostelService
-                .GetAll().Select(x => { x.ImageUrl = Path.Combine(_hostingEnvironment.WebRootPath, x.ImageUrl ?? ""); return x; })
+                .GetAll().Select(x => { x.ImageUrl = Path.Combine(Request.Host.Value, x.ImageUrl ?? ""); return x; })
                 .ToList());
         }
 
