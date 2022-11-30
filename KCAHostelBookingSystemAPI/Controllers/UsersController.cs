@@ -1,5 +1,8 @@
 ﻿using BAL_CRUD.Interfaces;
 using DAL_CRUD.Models;
+using KCAHostelBookingSystemAPI.Auth;
+using KCAHostelBookingSystemAPI.Models;
+using KCAHostelBookingSystemAPI.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +13,15 @@ namespace KCAHostelUserSystemAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-
-        public UsersController(IUserService userService)
+        private readonly IHostelService _hostelService;
+        private readonly IConfiguration _configuration;
+        private readonly EmailService _emailService;
+        public UsersController(IUserService userService, IHostelService hostelService, IConfiguration configuration, EmailService emailService)
         {
             _userService = userService;
+            _configuration = configuration;
+            _emailService = emailService;
+            _hostelService = hostelService;
         }
         // GET: api/<UserController>
         [HttpGet]
@@ -39,7 +47,37 @@ namespace KCAHostelUserSystemAPI.Controllers
         public IActionResult Post([FromBody] User value)
         {
             var result = _userService.Create(value);
-            return result != null ? Ok(result) : BadRequest(value);
+            if(result == null)
+            {
+                return BadRequest(value);
+            }
+
+            SendBookingSuccessEmail(result);
+            return Ok(result) ;
+        }
+
+        private async Task SendBookingSuccessEmail(User user)
+        {
+            Hostel hostel = _hostelService.GetById((int)user.HostelId);
+
+            string appDomain = _configuration.GetSection("Application:AppDomain").Value;
+            string confirmationLink = _configuration.GetSection("Application:BookingSuccessful").Value;
+
+            UserEmailOptions options = new UserEmailOptions
+            {
+                ToEmails = new List<string>() { user.Email },
+                PlaceHolders = new List<KeyValuePair<string, string>>()
+                {
+                    new KeyValuePair<string, string>("{{UserName}}", user.FirstName),
+                    new KeyValuePair<string, string>("{{hostelName}}", hostel.Name),
+                    new KeyValuePair<string, string>("{{location}}", hostel.Location),
+                    new KeyValuePair<string, string>("{{rentalCost}}", hostel.RentalCost.ToString()),
+                    new KeyValuePair<string, string>("{{imageUrl}}", Path.Combine(Request.Host.Value, hostel.ImageUrl ?? "")),
+                   
+                }
+            };
+
+            await _emailService.SendEmailBookingSuccessful(options);
         }
 
         // PUT api/<UserController>/5
