@@ -7,9 +7,9 @@ namespace KCAHostelBookingSystemAPI.Auth
 {
     public class ApplicationUser : IdentityUser
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        //[Key]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //public int Id { get; set; }
 
         [Required]
         public string? Email { get; set; }

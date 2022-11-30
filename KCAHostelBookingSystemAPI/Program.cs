@@ -3,6 +3,8 @@ using BAL_CRUD.Services;
 using DAL_CRUD.Data;
 using DAL_CRUD.Repositories;
 using KCAHostelBookingSystemAPI.Auth;
+using KCAHostelBookingSystemAPI.Models;
+using KCAHostelBookingSystemAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,8 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 //TODO: make connection string for authentication
-//builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("RemoteConnection")));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+//builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("RemoteConnection")));
 
 builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("AuthConnection")));
 
@@ -54,8 +56,8 @@ builder.Services.AddTransient<IHostelService,HostelService>();
 builder.Services.AddTransient<IBookService, BookService>();
 builder.Services.AddTransient<IRentAlternativeService,RentAlternativeService>();
 builder.Services.AddTransient<IAmenityService,ArmenityService>();
-
-
+builder.Services.Configure<SMTPConfigModel>(builder.Configuration.GetSection("SMTPConfig"));
+builder.Services.AddSingleton<EmailService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
