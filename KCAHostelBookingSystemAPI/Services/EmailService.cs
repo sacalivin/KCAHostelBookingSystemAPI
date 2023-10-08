@@ -29,6 +29,15 @@ namespace KCAHostelBookingSystemAPI.Services
             await SendEmail(userEmailOptions);
         }
 
+        public async Task SendEmailBookingPropt(UserEmailOptions userEmailOptions)
+        {
+            userEmailOptions.Subject = UpdatePlaceHolders("Hello {{name}}, Booking Successful.", userEmailOptions.PlaceHolders);
+
+            userEmailOptions.Body = UpdatePlaceHolders(GetEmailBody("BookingSuccessful"), userEmailOptions.PlaceHolders);
+
+            await SendEmail(userEmailOptions);
+        }
+
         public async Task SendEmailBookingSuccessful(UserEmailOptions userEmailOptions)
         {
             userEmailOptions.Subject = UpdatePlaceHolders("Hello {{UserName}}, Booking Successful.", userEmailOptions.PlaceHolders);

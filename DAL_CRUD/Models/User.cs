@@ -29,6 +29,8 @@ namespace DAL_CRUD.Models
         public DateTime CheckinDate { get; set; }
         
         public DateTime BookingDate { get; set; } = DateTime.Now;
+        [NotMapped]
+        public long MpesaPhoneNumber { get; set; }
 
         public int? HostelId { get; set; }
         public Hostel? Hostel { get; set; }

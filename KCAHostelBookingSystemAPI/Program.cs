@@ -58,6 +58,7 @@ builder.Services.AddTransient<IRentAlternativeService,RentAlternativeService>();
 builder.Services.AddTransient<IAmenityService,ArmenityService>();
 builder.Services.Configure<SMTPConfigModel>(builder.Configuration.GetSection("SMTPConfig"));
 builder.Services.AddSingleton<EmailService>();
+builder.Services.AddTransient<MpesaService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
